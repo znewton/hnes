@@ -250,6 +250,40 @@ function rebuildMain() {
 
 function rebuildFooter() {
     let footer = document.createElement('footer');
+    let currentFooterLinks = document.getElementsByClassName('yclinks')[0].getElementsByTagName('a');
+    let footerLinks = [];
+    for (let i = 0; i < currentFooterLinks.length; ++i) {
+        footerLinks.push({
+            text: currentFooterLinks[i].textContent,
+            href: currentFooterLinks[i].getAttribute('href')
+        });
+    }
+    console.log(footerLinks)
+    let footerLinksBlock = document.createElement('div');
+    footerLinksBlock.className = 'footer-links';
+    for (let i = 0; i < footerLinks.length; ++i) {
+        let link = document.createElement('a');
+        link.className = 'footer-link';
+        link.href = footerLinks[i].href;
+        link.innerText = footerLinks[i].text;
+        footerLinksBlock.appendChild(link);
+    }
+    footer.appendChild(footerLinksBlock);
+    let searchForm = document.createElement('form');
+    searchForm.method = 'get';
+    searchForm.action = '//hn.algolia.com/';
+    let searchLabel = document.createElement('label');
+    searchLabel.for = 'footer-search';
+    searchLabel.appendChild(document.createTextNode('Search: '))
+    let searchInput = document.createElement('input');
+    searchInput.id = 'footer-search';
+    searchInput.name = 'q';
+    searchInput.autocomplete = false;
+    searchInput.spellcheck = false;
+    searchInput.type = 'text';
+    searchLabel.appendChild(searchInput);
+    searchForm.appendChild(searchLabel);
+    footer.appendChild(searchForm);
     return footer;
 }
 
