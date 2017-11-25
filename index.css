@@ -1,4 +1,4 @@
-root {
+:root {
     --orange: #ff6600;
 }
 body {
@@ -6,7 +6,86 @@ body {
     padding: 0;
     font-family: Verdana, Geneva, sans-serif;
     font-size: 10pt;
+    background-color: #dedede;
 }
-tr:first-of-type {
+
+body * {
+    box-sizing: border-box;
+    position: relative;
+}
+
+main {
+    display: block;
+}
+
+.post {
+    display: flex;
+    width: 60em;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin: 0.5em auto;
+    height: 4.5rem;
+    background-color: #fefefe;
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.3), 0 0 2px rgba(0,0,0,0.2);
+}
+.post > * {
+    display: flex;
+    align-items: center;
+    flex-basis: 100%;
+    justify-content: center;
+}
+
+.title {
+    flex-basis: 6%;
+    opacity: 0.35;
+}
+.score {
+    flex-direction: column;
+    flex-basis: 7%;
+    color: #6a6a6a;
+}
+.upvote {
+    --arrow-size: 0.5rem;
+	position: relative;
+	background-color: #6a6a6a;
+    transition: background-color ease 100ms;
+}
+.upvote:before,
+.upvote:after {
+	content: '';
+	position: absolute;
+	background-color: inherit;
+}
+.upvote,
+.upvote:before,
+.upvote:after {
+	width:  var(--arrow-size);
+	height: var(--arrow-size);
+	border-top-right-radius: 30%;
+}
+
+.upvote {
+	transform: rotate(-60deg) skewX(-30deg) scale(1,.866);
+}
+.upvote:before {
+	transform: rotate(-135deg) skewX(-45deg) scale(1.414,.707) translate(0,-50%);
+}
+.upvote:after {
+	transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
+}
+.upvote:hover {
     background-color: var(--orange);
+}
+.points {
+    margin-top: 0.5rem;
+}
+.story {
+    padding-left: 1rem;
+    flex-basis: 60%;
+    align-items: left;
+    flex-direction: column;
+}
+.story-site {
+    flex-basis: 25%;
+    justify-content: right;
 }
