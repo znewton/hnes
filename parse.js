@@ -123,7 +123,30 @@ function buildPostHTML(post) {
     return element;
 }
 
-let postData = getPosts(document.body);
+function rebuildNavbar() {
+    let nav = document.createElement('nav');
+    return nav;
+}
+
+function rebuildMain() {
+    let postData = getPosts(document.body);
+    let postList = document.createElement('main');
+    postList.className = 'post-list';
+    for (let i = 0; i < postData.length; ++i) {
+        console.log(postData[i]);
+        postList.appendChild(buildPostHTML(postData[i]));
+    }
+    return postList;
+}
+
+function rebuildFooter() {
+    let footer = document.createElement('footer');
+    return footer;
+}
+
+let nav = rebuildNavbar();
+let main = rebuildMain();
+let footer = rebuildFooter();
 let headLinks = document.head.getElementsByTagName('link');
 for (let i = 0; i < headLinks.length; ++i) {
     if (headLinks[i].getAttribute('rel') == 'stylesheet') {
@@ -132,10 +155,6 @@ for (let i = 0; i < headLinks.length; ++i) {
     }
 }
 document.body.innerHTML = '';
-let postList = document.createElement('main');
-postList.className = 'post-list';
-for (let i = 0; i < postData.length; ++i) {
-    console.log(postData[i]);
-    postList.appendChild(buildPostHTML(postData[i]));
-}
-document.body.appendChild(postList);
+document.body.appendChild(nav);
+document.body.appendChild(main);
+document.body.appendChild(footer);

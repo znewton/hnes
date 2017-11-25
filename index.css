@@ -73,7 +73,7 @@ main {
 .upvote:after {
 	transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
 }
-.upvote:hover {
+.score:hover .upvote {
     background-color: var(--orange);
 }
 .points {
@@ -84,8 +84,44 @@ main {
     flex-basis: 60%;
     align-items: left;
     flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .story-site {
     flex-basis: 25%;
     justify-content: right;
 }
+
+.post a {
+    color: inherit;
+    text-decoration: none;
+    transition: color ease 75ms;
+}
+.post a:visited {
+    color: #6a6a6a;
+}
+.post :not(.score) a:hover {
+    color: var(--orange);
+}
+.post :not(.score) a::after {
+    will-change: transform;
+    content: "";
+    display: block;
+    background-color: #acacac;
+    opacity: 0.1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1.1rem;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 150ms ease;
+}
+
+.post :not(.score) a:hover::after {
+    width: 100%;
+    transform: scaleX(1);
+}
+
