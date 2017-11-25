@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "HackerNews Enhancement Suite",
+  "version": "1.0",
+  "description": "Enhances the usability of news.ycombinator.com",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://news.ycombinator.com/*"],
+      "js": [
+        "parse.js"
+      ],
+      "css": [
+        "index.css"
+      ]
+    }
+  ]
+
+}
