@@ -36,7 +36,7 @@ main {
 footer {
     background-color: #fafafa;
     width: 100%;
-    height: 5rem;
+    height: 7rem;
     margin-top: 2rem;
 }
 
@@ -113,6 +113,11 @@ nav a {
     line-height: 1.2rem;
     box-shadow: 1px 2px 5px rgba(0,0,0,0.1), 0 0 2px rgba(0,0,0,0.05);
 }
+@media (max-width: 59.9em) {
+    .post {
+        width: 98%
+    }
+}
 .post > * {
     display: flex;
     align-items: center;
@@ -158,7 +163,7 @@ nav a {
 .upvote:after {
 	transform: rotate(135deg) skewY(-45deg) scale(.707,1.414) translate(50%);
 }
-.score:hover .upvote {
+.score:hover .upvote, .upvoted {
     background-color: var(--orange);
 }
 .points {
@@ -221,6 +226,11 @@ nav a {
     margin-top: 1rem;
     text-align: center;
 }
+@media (max-width: 59.9em) {
+    .more-block {
+        width: 98%
+    }
+}
 .more-block a {
     background-color: #fbfbfb;
     display: flex;
@@ -247,6 +257,9 @@ footer {
     padding-top: 0.5rem;
 }
 
+.footer-links {
+    width: 98%;
+}
 .footer-link {
     padding: 0 0.5rem;
     color: inherit;

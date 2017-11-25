@@ -5,6 +5,7 @@
  */
 function getPosts(page) {
     let itemList = page.getElementsByClassName('itemlist')[0];
+    if (!itemList) return null;
     let posts = itemList.getElementsByClassName('athing');
     let data = [];
     for (let p = 0; p < posts.length; ++p) {
@@ -12,7 +13,8 @@ function getPosts(page) {
         let info = post.nextElementSibling;
         let title = post.getElementsByClassName('title')[0];
         let voteLink = post.getElementsByClassName('votelinks')[0];
-        if (voteLink) voteLink = voteLink.getElementsByTagName('a')[0];
+        let unvoteLink = document.getElementById('un_' + post.id);
+        if (voteLink) voteLink = unvoteLink ? null : voteLink.getElementsByTagName('a')[0];
         let storylink = post.getElementsByClassName('storylink')[0];
         let sitestr = post.getElementsByClassName('sitestr')[0];
         let score = info.getElementsByClassName('score')[0];
@@ -26,6 +28,7 @@ function getPosts(page) {
         let comments = infoLinks[infoLinks.length-1];
         let thisPost = {
             title: title ? title.textContent : '',
+            id: post.id,
             story: {
                 text: storylink ? storylink.textContent : '',
                 href: storylink ? storylink.href : '',
@@ -36,7 +39,8 @@ function getPosts(page) {
             },
             vote: {
                 id: voteLink ? voteLink.id : voteLink,
-                href: voteLink ? voteLink.href : voteLink,
+                href: voteLink ? voteLink.href : (unvoteLink ? unvoteLink.href : ''),
+                unvote: unvoteLink
             },
             score: {
                 id: score ? score.id : score,
@@ -79,14 +83,28 @@ function buildPostHTML(post) {
 
     let score = document.createElement('a');
     score.className = 'score';
+    score.id = 'score'+post.id;
     if (post.vote.href) {
         score.href = post.vote.href;
         let vote = document.createElement('div');
-        vote.className = 'upvote';
+        vote.className = 'upvote' + (post.vote.unvote ? ' upvoted' : '');
         score.appendChild(vote);
         let points = document.createElement('div');
         points.className = 'points';
         points.innerText = post.score.points;
+        score.onclick = (e) => {
+            e.preventDefault();
+            new Image().src = post.vote.href;
+            let scoreElement = document.getElementById('score' + post.id);
+            if (vote.classList.contains('upvoted')) {
+                vote.classList.remove('upvoted');
+                scoreElement.href = scoreElement.href.replace('how=un','how=up')
+            } else {
+                vote.classList.add('upvoted');
+                scoreElement.href = scoreElement.href.replace('how=up','how=un')
+            }
+            e.stopPropagation();
+        }
         score.appendChild(points);
     }
     element.appendChild(score);
@@ -239,10 +257,10 @@ function rebuildNavbar() {
 
 function rebuildMain() {
     let postData = getPosts(document.body);
+    if (!postData) return null;
     let postList = document.createElement('main');
     postList.className = 'post-list';
     for (let i = 0; i < postData.length; ++i) {
-        // console.log(postData[i]);
         postList.appendChild(buildPostHTML(postData[i]));
     }
     let morelink = document.getElementsByClassName('morelink')[0];
@@ -257,6 +275,7 @@ function rebuildMain() {
 
 function rebuildFooter() {
     let footer = document.createElement('footer');
+    if (!document.getElementsByClassName('yclinks')[0]) return null;
     let currentFooterLinks = document.getElementsByClassName('yclinks')[0].getElementsByTagName('a');
     let footerLinks = [];
     for (let i = 0; i < currentFooterLinks.length; ++i) {
@@ -265,7 +284,6 @@ function rebuildFooter() {
             href: currentFooterLinks[i].getAttribute('href')
         });
     }
-    console.log(footerLinks)
     let footerLinksBlock = document.createElement('div');
     footerLinksBlock.className = 'footer-links';
     for (let i = 0; i < footerLinks.length; ++i) {
@@ -304,7 +322,7 @@ for (let i = 0; i < headLinks.length; ++i) {
         break;
     }
 }
-document.body.innerHTML = '';
-document.body.appendChild(nav);
-document.body.appendChild(main);
-document.body.appendChild(footer);
+if (nav && main && footer) document.body.innerHTML = '';
+if (nav) document.body.appendChild(nav);
+if (main) document.body.appendChild(main);
+if (footer) document.body.appendChild(footer);
