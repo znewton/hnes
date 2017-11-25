@@ -131,13 +131,11 @@ function buildPostHTML(post) {
         user.innerText = post.user.name;
         info.appendChild(user);
     }
-    if (post.comments.number >= 0) {
-        info.appendChild(document.createTextNode(' | '));
-        let comments = document.createElement('a');
-        comments.innerText = post.comments.number + ' comments';
-        comments.href = post.comments.href;
-        info.appendChild(comments);
-    }
+    info.appendChild(document.createTextNode(' | '));
+    let comments = document.createElement('a');
+    comments.innerText = post.comments.number >= 0 ? (post.comments.number + ' comments') : 'discuss';
+    comments.href = post.comments.href;
+    info.appendChild(comments);
     story.appendChild(info);
     element.appendChild(story);
 
@@ -315,14 +313,17 @@ function rebuildFooter() {
 let nav = rebuildNavbar();
 let main = rebuildMain();
 let footer = rebuildFooter();
-let headLinks = document.head.getElementsByTagName('link');
-for (let i = 0; i < headLinks.length; ++i) {
-    if (headLinks[i].getAttribute('rel') == 'stylesheet') {
-        document.head.removeChild(headLinks[i]);
-        break;
+// check that is is main page, figure out styling of subpages later
+if (nav && main && footer) {
+    let headLinks = document.head.getElementsByTagName('link');
+    for (let i = 0; i < headLinks.length; ++i) {
+        if (headLinks[i].getAttribute('rel') == 'stylesheet') {
+            document.head.removeChild(headLinks[i]);
+            break;
+        }
     }
+    if (nav && main && footer) document.body.innerHTML = '';
+    if (nav) document.body.appendChild(nav);
+    if (main) document.body.appendChild(main);
+    if (footer) document.body.appendChild(footer);
 }
-if (nav && main && footer) document.body.innerHTML = '';
-if (nav) document.body.appendChild(nav);
-if (main) document.body.appendChild(main);
-if (footer) document.body.appendChild(footer);
