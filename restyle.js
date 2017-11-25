@@ -245,6 +245,13 @@ function rebuildMain() {
         // console.log(postData[i]);
         postList.appendChild(buildPostHTML(postData[i]));
     }
+    let morelink = document.getElementsByClassName('morelink')[0];
+    let moreUrl = morelink ? morelink.getAttribute('href') : '';
+    let moreBlock = document.createElement('div');
+    moreBlock.className = 'more-block';
+    morelink.parentElement.removeChild(morelink);
+    moreBlock.appendChild(morelink);
+    postList.appendChild(moreBlock);
     return postList;
 }
 

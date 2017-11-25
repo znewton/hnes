@@ -10,7 +10,7 @@
     {
       "matches": ["*://news.ycombinator.com/*"],
       "js": [
-        "parse.js"
+        "restyle.js"
       ],
       "css": [
         "index.css"
