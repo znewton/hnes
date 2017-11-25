@@ -20,7 +20,9 @@ function getPosts(page) {
         let age = info.getElementsByClassName('age')[0];
         if (age) age = age.firstElementChild;
         let infoLinks = info.getElementsByTagName('a');
-        let hide = infoLinks[infoLinks.length-2];
+        let hide = infoLinks[2];
+        let past = info.getElementsByClassName('hnpast')[0];
+        let web = infoLinks[infoLinks.length - 2] && infoLinks[infoLinks.length - 2].textContent == 'web' ? infoLinks[infoLinks.length - 2].getAttribute('href') : '';
         let comments = infoLinks[infoLinks.length-1];
         let thisPost = {
             title: title ? title.textContent : '',
@@ -49,8 +51,10 @@ function getPosts(page) {
                 href: age ? age.getAttribute('href') : ''
             },
             hideLink: hide ? hide.href : '',
+            pastLink: past ? past.getAttribute('href') : '',
+            webLink: web,
             comments: {
-                number: comments ? parseInt(comments.textContent.replace(/\D+/g, '')) : null,
+                number: comments && comments.textContent != 'discuss' ? parseInt(comments.textContent.replace(/\D+/g, '')) : -1,
                 href: comments ? comments.href : ''
             }
         };
@@ -75,20 +79,23 @@ function buildPostHTML(post) {
 
     let score = document.createElement('a');
     score.className = 'score';
-    score.href = post.vote.href;
-    let vote = document.createElement('div');
-    vote.className = 'upvote';
-    score.appendChild(vote);
-    let points = document.createElement('div');
-    points.className = 'points';
-    points.innerText = post.score.points;
-    score.appendChild(points);
+    if (post.vote.href) {
+        score.href = post.vote.href;
+        let vote = document.createElement('div');
+        vote.className = 'upvote';
+        score.appendChild(vote);
+        let points = document.createElement('div');
+        points.className = 'points';
+        points.innerText = post.score.points;
+        score.appendChild(points);
+    }
     element.appendChild(score);
     
     let story = document.createElement('div');
     story.className = 'story';
     let storyLink = document.createElement('a');
     storyLink.innerText = post.story.text;
+    storyLink.title = post.story.text;
     storyLink.href = post.story.href;
     story.appendChild(storyLink);
     let info = document.createElement('div');
@@ -98,26 +105,32 @@ function buildPostHTML(post) {
     timeago.innerText = post.age.timeago;
     timeago.href = post.age.href;
     info.appendChild(timeago);
-    info.appendChild(document.createTextNode(' by '));
-    let user = document.createElement('a');
-    user.className = 'user';
-    user.href = post.user.href;
-    user.innerText = post.user.name;
-    info.appendChild(user);
-    info.appendChild(document.createTextNode(' | '));
-    let comments = document.createElement('a');
-    comments.innerText = post.comments.number + ' comments';
-    comments.href = post.comments.href;
-    info.appendChild(comments);
+    if (post.user.name) {
+        info.appendChild(document.createTextNode(' by '));
+        let user = document.createElement('a');
+        user.className = 'user';
+        user.href = post.user.href;
+        user.innerText = post.user.name;
+        info.appendChild(user);
+    }
+    if (post.comments.number >= 0) {
+        info.appendChild(document.createTextNode(' | '));
+        let comments = document.createElement('a');
+        comments.innerText = post.comments.number + ' comments';
+        comments.href = post.comments.href;
+        info.appendChild(comments);
+    }
     story.appendChild(info);
     element.appendChild(story);
 
     let storySite = document.createElement('div');
     storySite.className = 'story-site';
-    let storySiteLink = document.createElement('a');
-    storySiteLink.innerText = '(' + post.story.site.text + ')';
-    storySiteLink.href = post.story.site.href;
-    storySite.appendChild(storySiteLink);
+    if (post.story.site.text) {
+        let storySiteLink = document.createElement('a');
+        storySiteLink.innerText = '(' + post.story.site.text + ')';
+        storySiteLink.href = post.story.site.href;
+        storySite.appendChild(storySiteLink);
+    }
     element.appendChild(storySite);
 
     return element;
@@ -125,6 +138,102 @@ function buildPostHTML(post) {
 
 function rebuildNavbar() {
     let nav = document.createElement('nav');
+
+    let user = document.getElementById('me');
+    let navinfo = {};
+    let headerlinks = [
+        {
+            text: 'new',
+            href: 'newest',
+        }, 
+        {
+            text: 'best',
+            href: 'best',
+        }, 
+        {
+            text: 'comments',
+            href: 'newcomments'
+        },
+        {
+            text: 'show',
+            href: 'show'
+        },
+        {
+            text: 'ask',
+            href: 'ask'
+        },
+        {
+            text: 'jobs',
+            href: 'jobs'
+        },
+        {
+            text: 'submit',
+            href: 'submit'
+        }
+    ]
+    if (user) {
+        navinfo.username = user.textContent;
+        navinfo.userUrl = user.getAttribute('href');
+        let logout = document.getElementById('logout');
+        navinfo.logoutUrl = logout.getAttribute('href');
+        let userSection = user.parentElement;
+        user.innerText = '';
+        logout.innerText = '';
+        let karma = parseInt(userSection.textContent.replace(/\D+/g,''));
+        navinfo.karma = karma;
+        navinfo.threadsUrl = document.getElementsByClassName('pagetop')[0].getElementsByTagName('a')[1].getAttribute('href');
+        headerlinks.splice(2,0,{
+            text: 'threads',
+            href: navinfo.threadsUrl
+        });
+    } else {
+        navinfo.loginUrl = document.getElementsByClassName('pagetop')[1].getElementsByTagName('a')[0].getAttribute('href');
+    }
+    let left = document.createElement('div');
+    left.className = 'left';
+    let logo = document.createElement('a');
+    logo.href = 'https://news.ycombinator.com';
+    logo.innerText = 'Y';
+    logo.id = 'logo';
+    left.appendChild(logo);
+    let hnname = document.createElement('a');
+    hnname.className = 'hnname';
+    hnname.href = 'news';
+    hnname.innerText = 'Hacker News';
+    left.appendChild(hnname);
+    for (let i = 0; i < headerlinks.length; ++i) {
+        let link = document.createElement('a');
+        link.className = 'nav-link';
+        link.href = headerlinks[i].href;
+        link.innerText = headerlinks[i].text;
+        left.appendChild(link);
+    }
+    nav.appendChild(left);
+
+    let right = document.createElement('div');
+    right.className = 'right';
+    if (navinfo.logoutUrl) {
+        let userLink = document.createElement('a');
+        userLink.href = navinfo.userUrl;
+        userLink.innerText = navinfo.username + ' (' + (navinfo.karma > 0 ? '+' : '') + navinfo.karma + ')';
+        userLink.className = 'username nav-link';
+        right.appendChild(userLink);
+        let logout = document.createElement('a');
+        logout.id = 'logout';
+        logout.className = 'nav-link';
+        logout.href = navinfo.logoutUrl;
+        logout.innerText = 'logout';
+        right.appendChild(logout);
+    } else {
+        let login = document.createElement('a');
+        login.id = 'login';
+        login.className = 'nav-link';
+        login.href = navinfo.loginUrl;
+        login.innerText = 'login';
+        right.appendChild(login);
+    }
+    nav.appendChild(right);
+
     return nav;
 }
 
@@ -133,7 +242,7 @@ function rebuildMain() {
     let postList = document.createElement('main');
     postList.className = 'post-list';
     for (let i = 0; i < postData.length; ++i) {
-        console.log(postData[i]);
+        // console.log(postData[i]);
         postList.appendChild(buildPostHTML(postData[i]));
     }
     return postList;
